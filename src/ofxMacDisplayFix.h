@@ -18,6 +18,9 @@
 #include <iostream>
 
 namespace ofxMacDisplayFix {
+
+#pragma mark - structures
+
     struct DisplayMode {
         bool valid;
         struct {
@@ -84,6 +87,8 @@ namespace ofxMacDisplayFix {
         std::vector<DisplayMode> availableDisplayModes;
     };
     
+#pragma mark - get infos
+    
     std::vector<std::uint32_t> getActiveDisplayIDs();
     std::vector<std::string> getActiveDisplayUUIDs();
 
@@ -107,18 +112,36 @@ namespace ofxMacDisplayFix {
     Detail getDisplayDetailFromID(std::uint32_t displayID);
     Detail getDisplayDetailFromUUID(std::string uuidString);
     
+#pragma mark - window control function
+    
     inline bool setWindowShapeToDisplayForUUID(std::string uuidString,
                                                bool makeFullScreen = false)
     {
         std::uint32_t displayID = getDisplayIDFromUUID(uuidString);
         bool isDisplayExist = (displayID != kCGNullDirectDisplay);
-
+        
         auto &&rect = getDisplayRectangleFromUUID(uuidString);
-        ofSetWindowPosition(rect.x, rect.y);
-        if(makeFullScreen) ofSetWindowShape(rect.width, rect.height);
+        if(makeFullScreen) {
+            ofSetWindowPosition(rect.x, rect.y);
+            ofSetWindowShape(rect.width, rect.height);
+        } else {
+            constexpr float offset = 40.0f;
+            float w = ofGetWidth();
+            float h = ofGetHeight();
+            if(rect.width - 2.0f * offset < w) {
+                w = rect.width - 2.0f * offset;
+            }
+            if(rect.height - 2.0f * offset < h) {
+                h = rect.height - 2.0f * offset;
+            }
+            ofSetWindowShape(w, h);
+            ofSetWindowPosition(rect.x + offset, rect.y + offset);
+        }
         
         return isDisplayExist;
     }
+    
+#pragma mark about notification event
     
     enum class DisplayChangeSummary : std::uint32_t {
         BeginConfiguration      = (1 << 0),
@@ -134,17 +157,27 @@ namespace ofxMacDisplayFix {
         DesktopShapeChanged     = (1 << 12),
     };
     
+    extern ofEvent<DisplayChangeSummary> displayChanged;
+
     std::uint32_t operator&(DisplayChangeSummary x, DisplayChangeSummary y);
     std::uint32_t operator&(std::uint32_t x, DisplayChangeSummary y);
     std::uint32_t operator&(DisplayChangeSummary x, std::uint32_t y);
     std::ostream &operator<<(std::ostream &os, DisplayChangeSummary summary);
     
-    extern ofEvent<DisplayChangeSummary> displayChanged;
     struct DisplayChangeSummaryArgs : ofEventArgs {
         DisplayChangeSummary summary;
     };
     void startNotificationOnDisplaysChanged();
     void stopNotificationOnDisplaysChanged();
+    
+#pragma mark print info
+    
+    std::string allAvailableDisplayRectanglesString();
+    void printAllDisplayRectangles();
+    
+#pragma mark utility
+    
+    bool moveMouseToCenterOfDisplayForUUID(std::string uuidString);
 };
 
 using ofxMacDisplayFixChangeSummary = ofxMacDisplayFix::DisplayChangeSummary;

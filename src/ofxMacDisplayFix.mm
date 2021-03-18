@@ -14,7 +14,12 @@
 #import <Foundation/Foundation.h>
 #import <ApplicationServices/ApplicationServices.h>
 
+#include <sstream>
+
 namespace ofxMacDisplayFix {
+
+#pragma mark get infos
+    
     constexpr std::size_t max_display_num = 32;
     
     std::vector<std::uint32_t> getActiveDisplayIDs() {
@@ -188,6 +193,8 @@ namespace ofxMacDisplayFix {
         return detail;
     }
     
+#pragma mark about notification event
+    
     std::uint32_t operator&(DisplayChangeSummary x, DisplayChangeSummary y)
     { return static_cast<std::uint32_t>(x) & static_cast<std::uint32_t>(y); };
     std::uint32_t operator&(std::uint32_t x, DisplayChangeSummary y)
@@ -237,5 +244,41 @@ namespace ofxMacDisplayFix {
         if(status != kCGErrorSuccess) {
             ofLogError() << "error " << status;
         }
+    }
+    
+#pragma mark print info
+    
+    std::string allAvailableDisplayRectanglesString() {
+        auto &&uuids = getActiveDisplayUUIDs();
+        std::ostringstream ss{""};
+        for(auto i = 0; i < uuids.size(); ++i) {
+            auto &&uuid = uuids[i];
+            auto &&detail = getDisplayDetailFromUUID(uuid);
+            auto &&rect = detail.rect;
+            ss
+                << "display " << i << (detail.status.isMain ? " (main) " : "") << "\n"
+                << "  uuid:   " << uuid << "\n"
+                << "  {x, y}: {" << rect.x << ", " << rect.y << "}\n"
+                << "  {w, h}: {" << rect.width << ", " << rect.height << "}\n";
+        }
+        return ss.str();
+    }
+    void printAllDisplayRectangles()
+    { ofLogNotice() << allAvailableDisplayRectanglesString(); };
+    
+#pragma mark utility
+    
+    bool moveMouseToCenterOfDisplayForUUID(std::string uuid_str) {
+        auto display = getDisplayIDFromUUID(uuid_str);
+        auto rect = getDisplayRectangleFromUUID(uuid_str);
+        CGPoint p;
+        p.x = rect.width * 0.5f;
+        p.y = rect.height * 0.5f;
+        CGError ret = CGDisplayMoveCursorToPoint(display, p);
+        bool success = ret == kCGErrorSuccess;
+        if(success) {
+            ofLogWarning("ofxMacDisplayFix") << "moveMouseToCenterOfDisplayForUUID: " << ret;
+        }
+        return success;
     }
 };

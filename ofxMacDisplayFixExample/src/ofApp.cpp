@@ -8,6 +8,7 @@ public:
         searchUUIDs();
         registerCallback();
         printInfo();
+        ofxMacDisplayFix::printAllDisplayRectangles();
     }
     
     void searchUUIDs() {
@@ -40,6 +41,7 @@ public:
         ofDrawBitmapString("space: store display uuid", 20, 20);
         ofDrawBitmapString("enter: move window to stored display", 20, 40);
     }
+    
     void exit() {
         ofxMacDisplayFix::stopNotificationOnDisplaysChanged();
     }
@@ -59,17 +61,17 @@ public:
             }
             ofxMacDisplayFix::setWindowShapeToDisplayForUUID(storedUUID);
         }
+        if('0' <= key && key <= '9') {
+            int i = key - '0';
+            auto &&uuids = ofxMacDisplayFix::getActiveDisplayUUIDs();
+            if(i < uuids.size()) {
+                ofxMacDisplayFix::moveMouseToCenterOfDisplayForUUID(uuids[i]);
+            } else {
+                ofLogWarning() << "num display is " << key << ", but push " << key;
+            }
+        }
     }
-//    void keyReleased(int key);
-//    void mouseMoved(int x, int y );
-//    void mouseDragged(int x, int y, int button);
-//    void mousePressed(int x, int y, int button);
-//    void mouseReleased(int x, int y, int button);
-//    void mouseEntered(int x, int y);
-//    void mouseExited(int x, int y);
-//    void windowResized(int w, int h);
-//    void dragEvent(ofDragInfo dragInfo);
-//    void gotMessage(ofMessage msg);
+    
 };
 
 //========================================================================

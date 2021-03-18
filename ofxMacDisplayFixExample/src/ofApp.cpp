@@ -2,6 +2,7 @@
 #include "ofxMacDisplayFix.h"
 
 class ofApp : public ofBaseApp {
+    std::string storedUUID;
 public:
     void setup() {
         auto &&uuids = ofxMacDisplayFix::getActiveDisplayUUIDs();
@@ -10,6 +11,7 @@ public:
             auto &&rect = ofxMacDisplayFix::getDisplayRectangleFromUUID(uuid);
             ofLogNotice("rect") << rect;
         }
+        
         ofxMacDisplayFix::setWindowShapeToDisplayForUUID(uuids.back());
         ofxMacDisplayFix::startNotificationOnDisplaysChanged();
         ofAddListener(ofxMacDisplayFix::displayChanged,
@@ -27,7 +29,8 @@ public:
         
     }
     void draw() {
-        
+        ofDrawBitmapString("space: store display uuid", 20, 20);
+        ofDrawBitmapString("enter: move window to stored display", 20, 20);
     }
     void exit() {
         ofxMacDisplayFix::stopNotificationOnDisplaysChanged();
@@ -39,7 +42,14 @@ public:
     }
     void keyPressed(int key) {
         if(key == ' ') {
-            
+            storedUUID = ofxMacDisplayFix::getDisplayUUIDsAtCenterOfCurrentWindow().front();
+        }
+        if(key == OF_KEY_RETURN) {
+            if(storedUUID == "") {
+                ofLogWarning() << "please store window uuid with press space key at first";
+                return;
+            }
+            ofxMacDisplayFix::setWindowShapeToDisplayForUUID(storedUUID);
         }
     }
 //    void keyReleased(int key);

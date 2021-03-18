@@ -16,6 +16,7 @@
 
 namespace ofxMacDisplayFix {
     constexpr std::size_t max_display_num = 32;
+    
     std::vector<std::uint32_t> getActiveDisplayIDs() {
         CGDirectDisplayID displayIds[max_display_num];
         uint32_t displayCount;

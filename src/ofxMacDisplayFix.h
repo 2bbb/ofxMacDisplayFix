@@ -107,10 +107,17 @@ namespace ofxMacDisplayFix {
     Detail getDisplayDetailFromID(std::uint32_t displayID);
     Detail getDisplayDetailFromUUID(std::string uuidString);
     
-    inline void setWindowShapeToDisplayForUUID(std::string uuidString) {
+    inline bool setWindowShapeToDisplayForUUID(std::string uuidString,
+                                               bool makeFullScreen = false)
+    {
+        std::uint32_t displayID = getDisplayIDFromUUID(uuidString);
+        bool isDisplayExist = (displayID != kCGNullDirectDisplay);
+
         auto &&rect = getDisplayRectangleFromUUID(uuidString);
         ofSetWindowPosition(rect.x, rect.y);
-        ofSetWindowShape(rect.width, rect.height);
+        if(makeFullScreen) ofSetWindowShape(rect.width, rect.height);
+        
+        return isDisplayExist;
     }
     
     enum class DisplayChangeSummary : std::uint32_t {

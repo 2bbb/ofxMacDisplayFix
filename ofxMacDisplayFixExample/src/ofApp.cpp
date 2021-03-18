@@ -5,32 +5,40 @@ class ofApp : public ofBaseApp {
     std::string storedUUID;
 public:
     void setup() {
+        searchUUIDs();
+        registerCallback();
+        printInfo();
+    }
+    
+    void searchUUIDs() {
         auto &&uuids = ofxMacDisplayFix::getActiveDisplayUUIDs();
         for(auto &&uuid : uuids) {
             ofLogNotice("uuid") << uuid;
             auto &&rect = ofxMacDisplayFix::getDisplayRectangleFromUUID(uuid);
             ofLogNotice("rect") << rect;
         }
-        
-        ofxMacDisplayFix::setWindowShapeToDisplayForUUID(uuids.back());
-        ofxMacDisplayFix::startNotificationOnDisplaysChanged();
+    }
+    
+    void registerCallback() {
         ofAddListener(ofxMacDisplayFix::displayChanged,
                       this,
                       &ofApp::displayChanged);
-        
+        ofxMacDisplayFix::startNotificationOnDisplaysChanged();
+    }
+    
+    void printInfo() {
         auto display = ofxMacDisplayFix::getActiveDisplayIDs().back();
+        
         auto mode = ofxMacDisplayFix::getCurrentDisplayMode(display);
         ofLogNotice("refresh rate") << mode.refreshRate << std::endl;
         
         auto detail = ofxMacDisplayFix::getDisplayDetailFromID(display);
         ofLogNotice("physical size") << detail.physicalSize.width << ", " << detail.physicalSize.height;
     }
-    void update() {
-        
-    }
+    
     void draw() {
         ofDrawBitmapString("space: store display uuid", 20, 20);
-        ofDrawBitmapString("enter: move window to stored display", 20, 20);
+        ofDrawBitmapString("enter: move window to stored display", 20, 40);
     }
     void exit() {
         ofxMacDisplayFix::stopNotificationOnDisplaysChanged();

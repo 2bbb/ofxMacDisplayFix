@@ -135,7 +135,7 @@ namespace ofxMacDisplayFix {
                 h = rect.height - 2.0f * offset;
             }
             ofSetWindowShape(w, h);
-            ofSetWindowPosition(rect.x + offset, rect.y + offset);
+            ofSetWindowPosition(rect.x + offset, rect.height - offset - h);
         }
         
         return isDisplayExist;

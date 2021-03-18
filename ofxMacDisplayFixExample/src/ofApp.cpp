@@ -42,6 +42,16 @@ public:
         ofDrawBitmapString("enter: move window to stored display", 20, 40);
         ofDrawBitmapString("A-E:   move window to n-th display (A = main)", 20, 60);
         ofDrawBitmapString("0-9:   move cursor to center of n-th display (0 = main)", 20, 80);
+        
+        ofDrawBitmapString("current display is \"" + ofxMacDisplayFix::getDisplayUUIDsAtCenterOfCurrentWindow().front() + "\"", 20, 120);
+        auto rect = ofGetWindowRect();
+        ofDrawBitmapString(ofVAArgsToString("window shape is {%.3f, %.3f}, {%.3f, %.3f}",
+                                            rect.x,
+                                            rect.y,
+                                            rect.width,
+                                            rect.height),
+                           20,
+                           140);
     }
     
     void exit() {

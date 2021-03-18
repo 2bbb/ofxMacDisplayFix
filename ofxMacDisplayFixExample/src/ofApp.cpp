@@ -40,6 +40,8 @@ public:
     void draw() {
         ofDrawBitmapString("space: store display uuid", 20, 20);
         ofDrawBitmapString("enter: move window to stored display", 20, 40);
+        ofDrawBitmapString("A-E:   move window to n-th display (A = main)", 20, 60);
+        ofDrawBitmapString("0-9:   move cursor to center of n-th display (0 = main)", 20, 80);
     }
     
     void exit() {
@@ -60,6 +62,15 @@ public:
                 return;
             }
             ofxMacDisplayFix::setWindowShapeToDisplayForUUID(storedUUID);
+        }
+        if('A' <= key && key <= 'E') {
+            int i = key - 'A';
+            auto &&uuids = ofxMacDisplayFix::getActiveDisplayUUIDs();
+            if(i < uuids.size()) {
+                ofxMacDisplayFix::setWindowShapeToDisplayForUUID(uuids[i]);
+            } else {
+                ofLogWarning() << "num display is " << key << ", but push " << key;
+            }
         }
         if('0' <= key && key <= '9') {
             int i = key - '0';

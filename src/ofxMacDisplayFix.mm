@@ -67,14 +67,11 @@ namespace ofxMacDisplayFix {
     }
     
     std::uint32_t getDisplayIDFromUUID(std::string uuid_str) {
-        NSString *uuid_ = [[NSString alloc] initWithUTF8String:uuid_str.c_str()];
+        NSString *uuid_ = [NSString stringWithUTF8String:uuid_str.c_str()];
         CFStringRef str_ref = (__bridge CFStringRef)uuid_;
         CFUUIDRef uuid = CFUUIDCreateFromString(NULL, str_ref);
-        
         uint32_t displayID = CGDisplayGetDisplayIDFromUUID(uuid);
-        
         CFRelease(uuid);
-        [uuid_ release];
         
         return displayID;
     }
